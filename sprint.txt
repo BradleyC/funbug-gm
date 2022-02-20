@@ -1,0 +1,28 @@
+Registrar
+Rewrite Bounty / Famine
+Prize Pool
+Fee model
+NFT Inventory
+
+Prior to 7am
+Clean up diagrams (if needed)
+
+Prior to 8 am
+Add diagrams and more explanation to Devpost equivalent
+No visuals presentation
+
+After judging begins:
+IPFS deploymentENS linking
+Clean up diagrams
+Mainnet deploy
+Presentation
+
+
+Registrar
+
+gameId
+gameDeposit
+governIncentAddress
+ownedPropertyAddress
+prizePoolAddress
+prizePoolDistributionAddress

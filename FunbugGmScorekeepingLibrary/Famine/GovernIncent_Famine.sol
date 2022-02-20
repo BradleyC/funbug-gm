@@ -5,7 +5,7 @@ interface IFUNBUGgm {
     function resolveIncent(address add1, address add2, uint256 count) external returns (bool);
 }
 
-contract GovernIncent {
+contract GovernIncent_Famine {
     // Name: Famine
     // System: Scorekeeping
     // Description: When times are tough, turn to your people for support

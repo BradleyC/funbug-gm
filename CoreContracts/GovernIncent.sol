@@ -19,12 +19,16 @@ contract GovernIncent {
         Gm = _Gm;
     }
 
-    function receiveIncent(address initiate, address target, bool isReward) public {
-        if (isReward == true) {
-            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
-        }  else {
-            // isReward = false
-            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish);
-        }
+    function receiveIncent(address initiate, address target, bool isReward) public pure {
+        // if (isReward == true) {
+        //     // IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
+        // }  else {
+        //     // isReward = false
+        //     // IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish);
+        // }
+        initiate;
+        target;
+        isReward;
+        return;
     }
 }
