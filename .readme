@@ -7,3 +7,6 @@ Deploy Steps:
 3) set references to core contracts in FunbugRegistrar.sol
 4) set references to chosen systems contracts in FunbugRegistrar.sol
 5) 🕯 a resurrection 🕯
+
+We could not find a good way to store multiple versions of contracts with the same contract name & interface.
+Therefore, deployment is a bit painful - for Logic Circuit contracts 
