@@ -1,2 +1,9 @@
 File Strucuture:
 - Scorekeeping library is stored in its own mini file Strucuture
+
+Deploy Steps:
+1) Deploy FunbugRegistrar.sol
+2) Deploy FUNBUGgm.sol and FunbugInventory.sol
+3) set references to core contracts in FunbugRegistrar.sol
+4) set references to chosen systems contracts in FunbugRegistrar.sol
+5) 🕯 a resurrection 🕯

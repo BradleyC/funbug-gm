@@ -77,7 +77,7 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address _prizePoolLogicAddress
     ) public payable {
         require(msg.value >= depositPrice, 'MUST PAY COMPLETE DEPOSIT TO INSTANTIATE GAME');
-        address gameOwner = payable(msg.sender);
+        address gameOwner = msg.sender;
         funbugRegistry[gameOwner].push(FunbugGame(currentGameCount, _governIncentAddress, _sugarIncentAddress, _ownedPropertyAddress, _prizePoolLogicAddress));
         // transfer Funbugᵍᵐ to registrant's wallet
         IFUNBUGgm(FUNBUGgm).transfer(gameOwner, seedTokens);

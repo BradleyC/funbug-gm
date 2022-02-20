@@ -27,10 +27,6 @@ contract FUNBUGgm is ERC20, ERC20FlashMint {
         // emit event
     }
 
-    function incent(address initiate, address target, bool isReward) public {
-        IGovernIncent(GovernIncent).receiveIncent(initiate, target, isReward);
-    }
-
     function resolveIncent(address add1, address add2, uint256 count) private returns (bool) {
         if (add2 == address(0x0)) {
             transfer(add1, count);

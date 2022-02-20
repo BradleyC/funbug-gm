@@ -20,6 +20,7 @@ contract GovernIncent_Bounty {
     }
 
     function receiveIncent(address initiate, address target, bool isReward) public pure {
+        // require (msg.sender == funbugRegistrar);
         // if (isReward == true) {
         //     // IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
         // }  else {
