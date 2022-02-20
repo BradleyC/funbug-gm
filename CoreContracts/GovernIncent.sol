@@ -10,6 +10,8 @@ contract GovernIncent {
     // System: Scorekeeping
     // Description: When it rains, it pours
     // Author: @bradleyc
+    // this contract simply forwards a call to change a token balance based on hardcoded values.
+    // In reality, this logic could get quite complex.
 
     address Gm;
     uint256 bountyReward = 200;
@@ -19,16 +21,13 @@ contract GovernIncent {
         Gm = _Gm;
     }
 
-    function receiveIncent(address initiate, address target, bool isReward) public pure {
-        // if (isReward == true) {
-        //     // IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
-        // }  else {
-        //     // isReward = false
-        //     // IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish);
-        // }
-        initiate;
-        target;
-        isReward;
+    function receiveIncent(address initiate, address target, bool isReward) public {
+        if (isReward == true) {
+            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
+        }  else {
+            // isReward = false;
+            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish);
+        }
         return;
     }
 }
