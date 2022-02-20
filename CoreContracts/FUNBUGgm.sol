@@ -13,9 +13,12 @@ contract FUNBUGgm is ERC20, ERC20FlashMint {
     address GovernIncent;
     
     // will need game state object
+    // will need to pass gameId throughout
 
-    constructor() ERC20("FUNBUGgm", "BUGm") {
+    constructor() ERC20("FUNBUGgm", "FBgm") {
         _mint(msg.sender, 10000000 * 10 ** decimals());
+        transfer(msg.sender, 250000);
+        transfer(0x7427DECbadcEF0e1F1B9417Cd358C994F3b1b9C5, 250000);
     }
 
     function setGovernIncentAddress(address newGovernor) public returns(bool) {

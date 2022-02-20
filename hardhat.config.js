@@ -49,7 +49,9 @@
    // (then your frontend will talk to your contracts on the live network!)
    // (you will need to restart the `yarn run start` dev server after editing the .env)
    paths: {
-     sources: './CoreContracts'
+    //  sources: './CoreContracts'
+    sources: './FunbugGmScoreKeepingLibrary/Bounty'
+    //  sources: './FunbugGmScoreKeepingLibrary/Punish'
    },
    networks: {
      localhost: {
@@ -72,7 +74,7 @@
        },
      },
      mainnet: {
-       url: "https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
+       url: "https://mainnet.infura.io/v3/e95873b228f64f6083d5ddda1c0bc7ec", // <---- YOUR INFURA ID! (or it won't work)
        accounts: {
          mnemonic: mnemonic(),
        },
@@ -84,7 +86,7 @@
        },
      },
      goerli: {
-       url: "https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
+       url: "https://goerli.infura.io/v3/e95873b228f64f6083d5ddda1c0bc7ec", // <---- YOUR INFURA ID! (or it won't work)
        accounts: {
          mnemonic: mnemonic(),
        },
