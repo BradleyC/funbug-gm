@@ -78,12 +78,16 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     ) public payable {
         require(msg.value >= depositPrice, 'MUST PAY COMPLETE DEPOSIT TO INSTANTIATE GAME');
         address gameOwner = msg.sender;
-        funbugRegistry[gameOwner].push(FunbugGame(currentGameCount, _governIncentAddress, _sugarIncentAddress, _ownedPropertyAddress, _prizePoolLogicAddress));
+        setPrizePoolId();
+        setPrizePoolLogicAddress(_prizePoolLogicAddress);
+        setGovernIncentAddress(_governIncentAddress);
+        setSugarIncentAddress(_sugarIncentAddress);
+        setOwnedPropertyAddress(_ownedPropertyAddress);
         // transfer Funbugᵍᵐ to registrant's wallet
         IFUNBUGgm(FUNBUGgm).transfer(gameOwner, seedTokens);
         // as long as funds remain in your wallet, they are considered deposited in Funbugᵍᵐ ecosystem.
         // if you want custody of your game's Funbugᵍᵐ, move it to a different wallet.
-        IFUNBUGgm(FUNBUGgm).approve(address.this, seedTokens);  
+        IFUNBUGgm(FUNBUGgm).approve(address(this), seedTokens);  
         currentGameCount++;
         // TODO: fire event     
     }
@@ -139,23 +143,28 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Setters can only trigger updates on the game that matches the wallet they sign with.
     // Community can trigger these actions through a multisig, for example.
     function setPrizePoolLogicAddress(address newPrizePoolLogicAddress) public {
-        FunbugGame memory funbugGame = funbugRegistry[msg.sender];
-        funbugGame.prizePoolLogicAddress = newPrizePoolLogicAddress;
+        FunbugGame storage _funbugGame = funbugRegistry[msg.sender];
+        _funbugGame.prizePoolLogicAddress = newPrizePoolLogicAddress;
     }
 
     function setGovernIncentAddress(address newGovernIncentAddress) public {
-        FunbugGame memory funbugGame = funbugRegistry[msg.sender];
+        FunbugGame storage funbugGame = funbugRegistry[msg.sender];
         funbugGame.governIncentAddress = newGovernIncentAddress;
     }
 
     function setSugarIncentAddress(address newSugarIncentAddress) public {
-        FunbugGame memory funbugGame = funbugRegistry[msg.sender];
+        FunbugGame storage funbugGame = funbugRegistry[msg.sender];
         funbugGame.sugarIncentAddress = newSugarIncentAddress;
     }
 
     function setOwnedPropertyAddress(address newOwnedPropertyAddress) public {
-        FunbugGame memory funbugGame = funbugRegistry[msg.sender];
+        FunbugGame storage funbugGame = funbugRegistry[msg.sender];
         funbugGame.ownedPropertyAddress = newOwnedPropertyAddress;
+    }
+
+    function setPrizePoolId() internal {
+        FunbugGame storage funbugGame = funbugRegistry[msg.sender];
+        funbugGame.prizePoolId = currentGameCount;
     }
 
     function _authorizeUpgrade(address newImplementation)
