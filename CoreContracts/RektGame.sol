@@ -41,10 +41,11 @@ contract RektGame {
         }
     }
 
-    function createNew(uint64 startTime) external payable {
+    function createNew(uint256 startTime) external payable {
         require(msg.value == rektCreateFee, 'Must attach rekt fee');
         address[] memory bets;
-        uint id = rekts.push(Rekt(bets, startTime, timeOffsetBase, 0, 0, msg.sender)) - 1;
+        rekts.push(Rekt(bets, startTime, timeOffsetBase, 0, 0, msg.sender));
+        uint id = rekts.length - 1;
 
         emit RektCreated(msg.sender, id);
     }
@@ -59,9 +60,8 @@ contract RektGame {
         require(p.brokenClock < block.timestamp, 'Rekt has timed out, no more bets');
 
         // reset timer, add totals for the bets
-        // TODO:
         bytes32 ranStr = getRandom();
-        uint256 ranTime = uint256(uint8(ranStr));
+        uint256 ranTime = uint8(uint(ranStr));
         p.prevDuration = p.prevDuration + (ranTime * timeOffsetBase);
         p.brokenClock = block.timestamp + p.prevDuration;
         p.callIndex += 1;
