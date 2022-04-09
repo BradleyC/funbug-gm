@@ -49,9 +49,12 @@
    // (then your frontend will talk to your contracts on the live network!)
    // (you will need to restart the `yarn run start` dev server after editing the .env)
    paths: {
-    //  sources: './CoreContracts'
-    sources: './FunbugGmScoreKeepingLibrary/Bounty'
-    //  sources: './FunbugGmScoreKeepingLibrary/Punish'
+     sources: './CoreContracts',
+     artifacts: '.artifacts/CoreContracts'
+    //  sources: './FunbugGmScoreKeepingLibrary/Bounty',
+    //  artifacts: '.artifacts/FunbugGmScoreKeepingLibrary/Bounty'
+    //  sources: './FunbugGmScoreKeepingLibrary/Famine',
+    //  artifacts: '.artifacts/FunbugGmScoreKeepingLibrary/Famine'
    },
    networks: {
      localhost: {
@@ -75,9 +78,7 @@
      },
      mainnet: {
        url: "https://mainnet.infura.io/v3/e95873b228f64f6083d5ddda1c0bc7ec", // <---- YOUR INFURA ID! (or it won't work)
-       accounts: {
-         mnemonic: mnemonic(),
-       },
+       // accounts: [''],
      },
      ropsten: {
        url: "https://ropsten.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
@@ -87,9 +88,7 @@
      },
      goerli: {
        url: "https://goerli.infura.io/v3/e95873b228f64f6083d5ddda1c0bc7ec", // <---- YOUR INFURA ID! (or it won't work)
-       accounts: {
-         mnemonic: mnemonic(),
-       },
+       // accounts: [''],
      },
      xdai: {
        url: "https://rpc.xdaichain.com/",

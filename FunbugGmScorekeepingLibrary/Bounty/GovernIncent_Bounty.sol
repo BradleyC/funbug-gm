@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 interface IFUNBUGgm {
-    function resolveIncent(address add1, address add2, uint256 count, address gameWallet) external returns (bool);
+    function resolveIncent(address add1, address add2, uint256 count) external returns (bool);
 }
 
 contract GovernIncent {
@@ -21,12 +21,12 @@ contract GovernIncent {
         Gm = _Gm;
     }
 
-    function receiveIncent(address initiate, address target, bool isReward, address gameWallet) public {
+    function receiveIncent(address initiate, address target, bool isReward) public {
         if (isReward == true) {
-            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward, gameWallet);
+            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
         }  else {
             // isReward = false;
-            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish, gameWallet);
+            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish);
         }
         return;
     }

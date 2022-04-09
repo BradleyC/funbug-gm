@@ -6,16 +6,14 @@ interface IFUNBUGgm {
 }
 
 contract GovernIncent {
-    // Name: Bounty
+    // Name: Famine
     // System: Scorekeeping
-    // Description: When it rains, it pours
+    // Description: When times are tough, turn to your people for support
     // Author: @bradleyc
-    // this contract simply forwards a call to change a token balance based on hardcoded values.
-    // In reality, this logic could get quite complex.
-
+    
     address Gm;
-    uint256 bountyReward = 200;
-    uint256 bountyPunish = 1;
+    uint256 famineReward = 1;
+    uint256 faminePunish = 200;
 
     constructor(address _Gm) {
         Gm = _Gm;
@@ -23,11 +21,10 @@ contract GovernIncent {
 
     function receiveIncent(address initiate, address target, bool isReward) public {
         if (isReward == true) {
-            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyReward);
+            IFUNBUGgm(Gm).resolveIncent(initiate, target, famineReward);
         }  else {
-            // isReward = false;
-            IFUNBUGgm(Gm).resolveIncent(initiate, target, bountyPunish);
+            // isReward = false
+            IFUNBUGgm(Gm).resolveIncent(initiate, target, faminePunish);
         }
-        return;
     }
 }

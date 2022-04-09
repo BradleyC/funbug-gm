@@ -1,9 +1,9 @@
 async function main() {
     const famine = await ethers.getContractFactory("GovernIncent")
     // Gm Core address
-    const famineDeployed = await famine.deploy('0x87628323ade11376c42549cBF965d06E824939e2')
+    const famineDeployed = await famine.deploy('0x0516D324468c870e005021eDC9dFcD6126C3B8b4')
   
-    console.log("Funbugᵍᵐ deployed to:", famineDeployed.address)
+    console.log("Funbug Famine Scorekeeping deployed to:", famineDeployed.address)
   }
 
   main()
