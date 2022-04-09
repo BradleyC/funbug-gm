@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
+
+// External interface/schema needs for external GM calcs
 interface PoolGameGm {
-    function createNew(uint64 startTime) external payable;
+    function createNew(uint256 startTime) external payable;
     function action(uint id) external payable;
     function finalize(uint id) external;
     function withdrawFees(uint256 amount) external;
 }
 
-// TODO: Add external interface/schema needs for external GM calcs
-contract PrizePoolGn {
+abstract contract PrizePoolGn is ERC20 {
 
     struct Pool {
         address owner;
@@ -21,80 +24,59 @@ contract PrizePoolGn {
 
     address Gm;
     address owner;
-    uint betFee = 0.001 ether;
     uint poolCreateFee = 0.01 ether;
-    uint256 timeOffsetBase = 1000 * 60 * 60;
-    uint32 timeExponent = 1200;
+    uint gmEthRatio = 1 gwei;
     Pool[] public pools;
 
-    event PoolCreated(address indexed owner, uint indexed id);
-    event PoolBet(address indexed loser, uint indexed id, uint poolTotal);
-    event PoolFinished(address indexed owner, uint indexed id, uint poolTotal);
+    event PoolCreated(address indexed owner, address indexed account, uint indexed id);
+    event PoolDeposit(address indexed owner, uint indexed id, uint depositTotal);
+    event PoolWithdraw(address indexed owner, uint indexed id, uint withdrawTotal);
 
     constructor(address _Gm) {
         owner = msg.sender;
         Gm = _Gm;
     }
 
-    // Internal Skale RNG endpoint
-    function getRandom() public view returns (bytes32 addr) {
-        assembly {
-            let freemem := mload(0x40)
-            let start_addr := add(freemem, 0)
-            if iszero(staticcall(gas(), 0x18, 0, 0, start_addr, 32)) {
-              invalid()
-            }
-            addr := mload(freemem)
-        }
-    }
-
-    function createPool(uint64 startTime) external payable {
+    function createPool(address account, uint256 issueAmount) external payable {
         require(msg.value == poolCreateFee, 'Must attach pool fee');
+
         address[] memory bets;
         uint id = pools.push(Pool(bets, startTime, timeOffsetBase, 0, 0, msg.sender)) - 1;
 
-        emit PoolCreated(msg.sender, id);
+        PoolGameGm(account).createNew(block.timestamp);
+
+        emit PoolCreated(msg.sender, account, id);
     }
 
-    // - bet
-    function bet(uint id) external payable {
-        require(id != 0, 'ID must be specified');
-        require(msg.value == betFee, 'Must attach bet fee');
-        Pool storage p = pools[id];
-
-        // check if pool has timed out
-        require(p.brokenClock < block.timestamp, 'Pool has timed out, no more bets');
-
-        // reset timer, add totals for the bets
-        bytes32 ranStr = getRandom();
-        uint256 ranTime = uint256(uint8(ranStr));
-        p.prevDuration = p.prevDuration + (ranTime * timeOffsetBase);
-        p.brokenClock = block.timestamp + p.prevDuration;
-        p.callIndex += 1;
-        p.poolTotal += (msg.value - betFee);
-        p.bets.push(msg.sender);
-
-        // update storage
-        pools[id] = p;
-
-        emit PoolBet(msg.sender, id, p.poolTotal);
+    // NOTE: should this accept GM token?
+    function poolAction(uint id) external payable {
+        PoolGameGm(pools[id].account).action(id);
     }
 
-    // - finalize
-    function finalize(uint id) external {
-        require(id != 0, 'ID must be specified');
-        // Anyone can call? As long as teh pool has ended, it will pay the winner.
-        // require(msg.sender == owner, 'Must be owner');
-        
-        // call transfer to winner(s)?
-        Pool memory p = pools[id];
-        require(p.brokenClock > block.timestamp, 'Pool has not ended yet');
+    function poolFinalize(uint id) external payable {
+        PoolGameGm(pools[id].account).finalize(id);
+    }
 
-        // Last bet wins!
-        // NOTE: this could change to do multiple
-        address winner = p.bets[p.bets.length - 1];
-        require(payable(winner).send(p.poolTotal));
-        emit PoolFinished(winner, id, p.poolTotal);
+    // Deposit GM token
+    function deposit(uint id) external payable {
+        require(id != 0, 'ID must be specified');
+
+        // Conversion ratio - deposit ETH get GM
+        uint gm = msg.value / gmEthRatio;
+
+        transferFrom(address(this), pools[id].owner, gm);
+    }
+
+    // Withdraw GM token
+    function withdraw(uint id, uint256 amount) external {
+        require(id != 0, 'ID must be specified');
+        require(msg.sender == owner, 'Must be owner');
+
+        // TODO: Check balance_of gm
+        // Conversion ratio - withdraw GM get ETH
+        uint eth = amount * gmEthRatio;
+
+        transfer(pools[id].owner, eth);
     }
 
     function withdrawFees(uint256 amount) external {
