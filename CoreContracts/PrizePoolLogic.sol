@@ -1,21 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
+// @notice This contract manages changes to Funbugᵍᵐ token.
+interface IFUNBUGgm {
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
+}
+
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // External interface/schema needs for external GM calcs
-interface PoolGameGm {
+interface IRektGame {
     function createNew(uint256 startTime) external payable;
     function action(uint id) external payable;
     function finalize(uint id) external;
     function withdrawFees(uint256 amount) external;
 }
 
-abstract contract PrizePoolGn is ERC20 {
+abstract contract PrizePoolGn is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     struct Pool {
+        // remove owner
         address owner;
+        // account - address of game contract 
         address account;
         uint256 issuedTotal;
         uint256 usedTotal;
@@ -23,7 +32,7 @@ abstract contract PrizePoolGn is ERC20 {
     }
 
     address Gm;
-    address owner;
+    address registrar;
     uint poolCreateFee = 0.01 ether;
     uint gmEthRatio = 1 gwei;
     Pool[] public pools;
@@ -32,28 +41,28 @@ abstract contract PrizePoolGn is ERC20 {
     event PoolDeposit(address indexed owner, uint indexed id, uint depositTotal);
     event PoolWithdraw(address indexed owner, uint indexed id, uint withdrawTotal);
 
-    constructor(address _Gm) {
+    constructor(address _Gm, address _registrar) {
         owner = msg.sender;
+        registrar = _registrar;
         Gm = _Gm;
     }
 
-    function createPool(address account, uint256 issueAmount) external payable {
+    function createPool(address gameContract) external payable {
         require(msg.value == poolCreateFee, 'Must attach pool fee');
-        pools.push(Pool(msg.sender, account, issueAmount, 0, block.timestamp));
+        pools.push(Pool(msg.sender, gameContract, 0, 0, block.timestamp));
         uint id = pools.length - 1;
 
-        PoolGameGm(account).createNew(block.timestamp);
+        IRektGame(gameContract).createNew(block.timestamp);
 
-        emit PoolCreated(msg.sender, account, id);
+        emit PoolCreated(msg.sender, gameContract, id);
     }
 
-    // NOTE: should this accept GM token?
     function poolAction(uint id) external payable {
-        PoolGameGm(pools[id].account).action(id);
+        IRektGame(pools[id].account).action(id);
     }
 
     function poolFinalize(uint id) external payable {
-        PoolGameGm(pools[id].account).finalize(id);
+        IRektGame(pools[id].account).finalize(id);
     }
 
     // Deposit GM token
