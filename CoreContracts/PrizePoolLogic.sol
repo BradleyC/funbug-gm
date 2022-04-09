@@ -39,9 +39,8 @@ abstract contract PrizePoolGn is ERC20 {
 
     function createPool(address account, uint256 issueAmount) external payable {
         require(msg.value == poolCreateFee, 'Must attach pool fee');
-
-        address[] memory bets;
-        uint id = pools.push(Pool(bets, startTime, timeOffsetBase, 0, 0, msg.sender)) - 1;
+        pools.push(Pool(msg.sender, account, issueAmount, 0, block.timestamp));
+        uint id = pools.length - 1;
 
         PoolGameGm(account).createNew(block.timestamp);
 
