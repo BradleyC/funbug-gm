@@ -6,19 +6,20 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // 🕯 INTERFACES
-// All necessary inter-contract communication goes here.
-// This contract manages changes to Funbugᵍᵐ token.
+// @dev All necessary inter-contract communication goes here.
+
+// @notice This contract manages changes to Funbugᵍᵐ token.
 interface IFUNBUGgm {
     function transfer(address recipient, uint256 amount) external returns (bool);
     function approve(address spender, uint256 amount) external returns (bool);
 }
 
-// This contract determines the logic circuit used to control Funbugᵍᵐ token.
+// @notice This contract determines the logic circuit used to control Funbugᵍᵐ token.
 interface IGovernIncent {
     function receiveIncent(address initiate, address target, bool isReward) external;
 }
 
-// This contract determines the logic circuit used to control a game's soft currency token.
+// @notice This contract determines the logic circuit used to control a game's soft currency token.
 interface ISugarIncent {
     function receiveIncent(address initiate, address target, bool isReward) external;
 }
@@ -46,6 +47,8 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 currentGameCount;
 
     struct FunbugGame {
+        // game ID
+        uint256 gameId;
         // prize pool per game, optional
         uint256 prizePoolId;
         // logic circuit to use for awarding the prize pool
@@ -78,6 +81,8 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     ) public payable {
         require(msg.value >= depositPrice, 'MUST PAY COMPLETE DEPOSIT TO INSTANTIATE GAME');
         address gameOwner = msg.sender;
+        FunbugGame storage _funbugGame = funbugRegistry[msg.sender];
+        _funbugGame.gameId = currentGameCount;
         setPrizePoolId();
         setPrizePoolLogicAddress(_prizePoolLogicAddress);
         setGovernIncentAddress(_governIncentAddress);
@@ -87,7 +92,7 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         IFUNBUGgm(FUNBUGgm).transfer(gameOwner, seedTokens);
         // as long as funds remain in your wallet, they are considered deposited in Funbugᵍᵐ ecosystem.
         // if you want custody of your game's Funbugᵍᵐ, move it to a different wallet.
-        IFUNBUGgm(FUNBUGgm).approve(address(this), seedTokens);  
+        IFUNBUGgm(FUNBUGgm).approve(address(this), seedTokens);
         currentGameCount++;
         // TODO: fire event     
     }
@@ -105,12 +110,7 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
         // TODO: 
         // - ownedProperty - NFT controller
-        // - prizePool - self-explanatory
-
-    function withdrawGameDeposit() public pure {
-        // for time being, all deposits into funbug are permanent
-        return;
-    }
+        // - prizePool - shared lottery
 
     // 🕯 GETTERS
     // Methods to account for using address to index a mapping of structs
@@ -167,10 +167,22 @@ contract FunbugRegistrar is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         funbugGame.prizePoolId = currentGameCount;
     }
 
+    // 🕯 UTILITY
+    // @dev functions for contract maintenance
     function _authorizeUpgrade(address newImplementation)
         internal
         onlyOwner
         override
     {}
+
+    function withdrawAll() public {
+        uint256 amount = address(this).balance;
+        require(payable(owner()).send(amount));
+    }
+
+    function withdrawSip(uint256 withdraw) public onlyOwner {
+        uint256 amount = withdraw;
+        require(payable(owner()).send(amount));
+    }
 }
 
