@@ -1,10 +1,14 @@
 async function main() {
     // have to write one script per "source" in hardhat config
     // multiple sources not allowed so we have to manually toggle in contract then deploy these individually
-    const funbugCore = await ethers.getContractFactory("FUNBUGgm")
-    const funbugDeployed = await funbugCore.deploy()
+    funbugRegistrar = await ethers.getContractFactory("FunbugRegistrar")
+    const funbugRDeployed = await funbugRegistrar.deploy()
+    console.log("Funbug Registrar deployed to:", funbugRDeployed.address)
+
+    const funbugGm = await ethers.getContractFactory("FUNBUGgm")
+    const funbugGmDeployed = await funbugGm.deploy(funbugRDeployed.address)
   
-    console.log("Funbugᵍᵐ deployed to:", funbugDeployed.address)
+    console.log("Funbugᵍᵐ deployed to:", funbugGmDeployed.address)
   }
 
   main()

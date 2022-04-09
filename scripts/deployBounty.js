@@ -1,9 +1,9 @@
 async function main() {
     const bounty = await ethers.getContractFactory("GovernIncent")
     // Gm Core address
-    const bountyDeployed = await bounty.deploy('0x15dBb5929491D2E3e5466404d75dE36f3216e49C')
+    const bountyDeployed = await bounty.deploy('0x0516D324468c870e005021eDC9dFcD6126C3B8b4')
   
-    console.log("Funbugᵍᵐ deployed to:", bountyDeployed.address)
+    console.log("Funbug Bounty Scorekeeping deployed to:", bountyDeployed.address)
   }
 
   main()
