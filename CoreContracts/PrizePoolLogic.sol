@@ -1,15 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+interface PoolGameGm {
+    function createNew(uint64 startTime) external payable;
+    function action(uint id) external payable;
+    function finalize(uint id) external;
+    function withdrawFees(uint256 amount) external;
+}
+
 // TODO: Add external interface/schema needs for external GM calcs
 contract PrizePoolGn {
+
     struct Pool {
-        address[] bets;
-        uint256 brokenClock;
-        uint256 prevDuration;
-        uint64 poolTotal;
-        uint32 callIndex;
-        address admin;
+        address owner;
+        address account;
+        uint256 issuedTotal;
+        uint256 usedTotal;
+        uint256 createdAt;
     }
 
     address Gm;
@@ -22,7 +29,7 @@ contract PrizePoolGn {
 
     event PoolCreated(address indexed owner, uint indexed id);
     event PoolBet(address indexed loser, uint indexed id, uint poolTotal);
-    event PoolFinalized(address indexed owner, uint indexed id, uint poolTotal);
+    event PoolFinished(address indexed owner, uint indexed id, uint poolTotal);
 
     constructor(address _Gm) {
         owner = msg.sender;
@@ -34,7 +41,7 @@ contract PrizePoolGn {
         assembly {
             let freemem := mload(0x40)
             let start_addr := add(freemem, 0)
-            if iszero(staticcall(gas, 0x18, 0, 0, start_addr, 32)) {
+            if iszero(staticcall(gas(), 0x18, 0, 0, start_addr, 32)) {
               invalid()
             }
             addr := mload(freemem)
@@ -43,7 +50,8 @@ contract PrizePoolGn {
 
     function createPool(uint64 startTime) external payable {
         require(msg.value == poolCreateFee, 'Must attach pool fee');
-        uint id = pools.push(Pool([], block.timestamp, timeOffsetBase, 0, 0, msg.sender)) - 1;
+        address[] memory bets = [];
+        uint id = pools.push(Pool(bets, startTime, timeOffsetBase, 0, 0, msg.sender)) - 1;
 
         emit PoolCreated(msg.sender, id);
     }
@@ -52,7 +60,7 @@ contract PrizePoolGn {
     function bet(uint id) external payable {
         require(id != 0, 'ID must be specified');
         require(msg.value == betFee, 'Must attach bet fee');
-        Pool memory p = pools[id];
+        Pool storage p = pools[id];
 
         // check if pool has timed out
         require(p.brokenClock < block.timestamp, 'Pool has timed out, no more bets');
@@ -69,7 +77,7 @@ contract PrizePoolGn {
         // update storage
         pools[id] = p;
 
-        emit PoolBet(msg.sender, id, poolTotal);
+        emit PoolBet(msg.sender, id, p.poolTotal);
     }
 
     // - finalize
@@ -86,7 +94,7 @@ contract PrizePoolGn {
         // NOTE: this could change to do multiple
         address winner = p.bets[p.bets.length - 1];
         require(payable(winner).send(p.poolTotal));
-        emit PoolFinished(winner, id, p.poolTotal)
+        emit PoolFinished(winner, id, p.poolTotal);
     }
 
     function withdrawFees(uint256 amount) external {
