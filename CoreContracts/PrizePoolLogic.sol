@@ -50,7 +50,7 @@ contract PrizePoolGn {
 
     function createPool(uint64 startTime) external payable {
         require(msg.value == poolCreateFee, 'Must attach pool fee');
-        address[] memory bets = [];
+        address[] memory bets;
         uint id = pools.push(Pool(bets, startTime, timeOffsetBase, 0, 0, msg.sender)) - 1;
 
         emit PoolCreated(msg.sender, id);
