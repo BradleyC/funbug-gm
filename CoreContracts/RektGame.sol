@@ -1,4 +1,9 @@
 // SPDX-License-Identifier: MIT
+// @title τ : Tau protocol
+// @author @bradleyc
+// @notice This contract is the entry point and controller for the Tau protocol
+// @dev WIP WIP WIP WIP WIP
+// @custom:security-contact bc@goatkeepers.sh
 pragma solidity ^0.8.4;
 
 // TODO: Add external interface/schema needs for external GM calcs
@@ -53,7 +58,7 @@ contract RektGame {
     // - bet
     function action(uint id) external payable {
         require(id != 0, 'ID must be specified');
-        require(msg.value == betFee, 'Must attach bet fee');
+        require(msg.value > betFee, 'Must attach bet fee');
         Rekt storage p = rekts[id];
 
         // check if rekt has timed out
