@@ -26,8 +26,9 @@ abstract contract PrizePoolGn is Initializable, OwnableUpgradeable, UUPSUpgradea
         address owner;
         // account - address of game contract 
         address account;
-        uint256 issuedTotal;
-        uint256 usedTotal;
+        // TODO: add gameId from registrar
+        //
+        uint256 poolBalance;
         uint256 createdAt;
     }
 

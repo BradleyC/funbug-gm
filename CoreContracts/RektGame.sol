@@ -53,14 +53,14 @@ contract RektGame {
     // - bet
     function action(uint id) external payable {
         require(id != 0, 'ID must be specified');
-        require(msg.value == betFee, 'Must attach bet fee');
+        require(msg.value >= betFee, 'Must attach bet fee');
         Rekt storage p = rekts[id];
 
         // check if rekt has timed out
         require(p.brokenClock < block.timestamp, 'Rekt has timed out, no more bets');
 
         // reset timer, add totals for the bets
-        bytes32 ranStr = getRandom();
+        bytes32 ranStr = this.getRandom();
         uint256 ranTime = uint8(uint(ranStr));
         p.prevDuration = p.prevDuration + (ranTime * timeOffsetBase);
         p.brokenClock = block.timestamp + p.prevDuration;
