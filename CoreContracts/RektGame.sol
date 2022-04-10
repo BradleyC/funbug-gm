@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-// TODO: Add external interface/schema needs for external GM calcs
+interface IPrizePoolLogic {
+    function receiveDeposit(uint256 id, uint256 value) external;
+    function awardPool(uint256 poolId, address recipient) external;
+}
+
 contract RektGame {
     struct Rekt {
         address[] bets;
@@ -14,6 +18,7 @@ contract RektGame {
 
     address Gm;
     address owner;
+    address prizePool;
     uint betFee = 0.001 ether;
     uint rektCreateFee = 0.01 ether;
     uint256 timeOffsetBase = 1000 * 60 * 60;
@@ -24,9 +29,10 @@ contract RektGame {
     event RektBet(address indexed loser, uint indexed id, uint rektTotal);
     event RektFinished(address indexed owner, uint indexed id, uint rektTotal);
 
-    constructor(address _Gm) {
+    constructor(address _Gm, address _prizePool) {
         owner = msg.sender;
         Gm = _Gm;
+        prizePool = _prizePool;
     }
 
     // Internal Skale RNG endpoint
@@ -68,6 +74,8 @@ contract RektGame {
         p.rektTotal += (msg.value - betFee);
         p.bets.push(msg.sender);
 
+        IPrizePoolLogic(prizePool).receiveDeposit(id, p.rektTotal);
+
         // update storage
         rekts[id] = p;
 
@@ -87,7 +95,7 @@ contract RektGame {
         // Last bet wins!
         // NOTE: this could change to do multiple
         address winner = p.bets[p.bets.length - 1];
-        require(payable(winner).send(p.rektTotal));
+        IPrizePoolLogic(prizePool).awardPool(id, winner);
         emit RektFinished(winner, id, p.rektTotal);
     }
 
